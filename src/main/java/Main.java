@@ -7,8 +7,12 @@ public class Main {
     public static BlockingQueue<String> queueA = new ArrayBlockingQueue<>(100);
     public static BlockingQueue<String> queueB = new ArrayBlockingQueue<>(100);
     public static BlockingQueue<String> queueC = new ArrayBlockingQueue<>(100);
-    public static CopyOnWriteArrayList<Integer> countABC
-            = new CopyOnWriteArrayList<>(new Integer[]{0, 0, 0});
+    /*
+    public static int maxA = 0;
+    public static int maxB = 0;
+    public static int maxC = 0;
+    */
+    public static CopyOnWriteArrayList<Integer> countABC = new CopyOnWriteArrayList<>(new Integer[]{0, 0, 0});
 
     public static void main(String[] args) {
 
@@ -30,19 +34,7 @@ public class Main {
         Thread thread2 = new Thread(() -> {
             for (int i = 0; i < 10000; i++) {
                 try {
-                    String strA = queueA.take();
-                    char charA = 'a';
-                    int count = 0;
-                    for (int j = 0; j < strA.length(); j++) {
-                        if (strA.charAt(j) == charA) {
-                            count++;
-                        }
-                    }
-                    //System.out.println("count "+count);
-                    if (countABC.get(0) < count) {
-                        countABC.set(0, count);
-                    }
-                    //System.out.println("countABC.get(0) "+countABC.get(0));
+                    checkCount(0, 'a', queueA);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -53,18 +45,7 @@ public class Main {
         Thread thread3 = new Thread(() -> {
             for (int i = 0; i < 10000; i++) {
                 try {
-                    String strB = queueB.take();
-                    char charB = 'b';
-                    int count = 0;
-                    for (int j = 0; j < strB.length(); j++) {
-                        if (strB.charAt(j) == charB) {
-                            count++;
-                        }
-                    }
-                    if (countABC.get(1) < count) {
-                        countABC.set(1, count);
-                    }
-
+                    checkCount(1, 'b', queueB);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -75,18 +56,7 @@ public class Main {
         Thread thread4 = new Thread(() -> {
             for (int i = 0; i < 10000; i++) {
                 try {
-                    String strC = queueC.take();
-                    char charC = 'c';
-                    int count = 0;
-                    for (int j = 0; j < strC.length(); j++) {
-                        if (strC.charAt(j) == charC) {
-                            count++;
-                        }
-                    }
-                    if (countABC.get(2) < count) {
-                        countABC.set(2, count);
-                    }
-
+                    checkCount(2, 'c', queueC);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -108,6 +78,11 @@ public class Main {
         System.out.println("Максимальное количество символов 'a': " + countABC.get(0));
         System.out.println("Максимальное количество символов 'b': " + countABC.get(1));
         System.out.println("Максимальное количество символов 'c': " + countABC.get(2));
+        /*
+        System.out.println("Максимальное количество символов 'a': " + maxA);
+        System.out.println("Максимальное количество символов 'b': " + maxB);
+        System.out.println("Максимальное количество символов 'c': " + maxC);
+        */
     }
 
     public static String generateText(String letters, int length) {
@@ -117,6 +92,25 @@ public class Main {
             text.append(letters.charAt(random.nextInt(letters.length())));
         }
         return text.toString();
+    }
+
+    public static void checkCount(int index, char charABC, BlockingQueue<String> queue) throws InterruptedException {
+        String str = queue.take();
+        int count = 0;
+        for (int j = 0; j < str.length(); j++) {
+            if (str.charAt(j) == charABC) {
+                count++;
+            }
+        }
+
+        if (countABC.get(index) < count) {
+            countABC.set(index, count);
+        }
+        /*
+        if (maxC < count) {
+           maxC = count;
+        }
+        */
     }
 }
 
