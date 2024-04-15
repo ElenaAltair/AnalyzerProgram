@@ -106,6 +106,7 @@ public class Main {
         if (countABC.get(index) < count) {
             countABC.set(index, count);
         }
+        
         /*
         if (maxC < count) {
            maxC = count;
